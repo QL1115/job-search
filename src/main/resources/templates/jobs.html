@@ -20,7 +20,7 @@
     <div class="container-fluid">
 
         <!-- 退回上一頁或到下一頁 -->
-        <div class="row  justify-content-between bf-btn">
+        <div class="row backnextDiv justify-content-between bf-btn">
             <th:block ><div class="ml-3 col-3 text-left"><small id="back" class="text-muted back">&larr; Back</small></div></th:block>
             <th:block><div class="mr-3 col-3 text-right"><small id="next" class="text-muted back">Next &rarr;</small></div></th:block>
         </div>
@@ -77,14 +77,23 @@
                 var engine = $(this).attr("id");
                 $('.engine-item').removeClass('item-click');
                 $('#' + engine).addClass("item-click");
-                $('#type-span').text('(' + engine + ')');
+                $('#engine-span').text('(' + engine + ')');
 
                 // alert($('#type-span'));
                 var keyword = /*[[${keyword}]]*/ 'java';
+                var weight = /*[[${weight}]]*/ '10';
+                if (weight == null || weight === 'null') weight = '';
+
                 if ("google" === engine || "bing" === engine || "yahoo" === engine) {
+                    if (weight == null || weight == '') {
+                        $('#backnextDiv').append('<div id="loading" class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">' +
+                                                '<span class="sr-only">Loading...</span>' +
+                                                '</div>')
+                        $('#replacement').addClass('hidden');
+                    }
                     $.ajax({
                         type: "POST",
-                        url: "/search-engine?engine=" + encodeURIComponent(engine) + "&keyword=" + encodeURIComponent(keyword),
+                        url: "/search-engine?engine=" + encodeURIComponent(engine) + "&keyword=" + encodeURIComponent(keyword) + (weight === '' ? "" : "&weight="+encodeURIComponent(weight)) ,
                         dataType: "json",
                         success: function (data) {
                             $('#replacement').empty();  // 清空
@@ -99,6 +108,8 @@
                                                                     '</div>' +
                                                                 '</div>' +
                                                         '</div>');
+                                $('#replacement').find('#loading').remove();
+                                $('#replacement').removeClass('hidden');
                             });
 
                             // alert(data[0].title)

@@ -15,7 +15,7 @@ html {
     color: #4285f4;
 }
 
-input:focus {
+*:focus {
     outline: none;
 }
 

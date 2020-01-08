@@ -1,6 +1,9 @@
 package com.ql.jobsearch.util;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import com.ql.jobsearch.pojo.Job;
+import com.ql.jobsearch.pojo.Keyword;
+import com.ql.jobsearch.pojo.KeywordList;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,35 +15,49 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class SearchEngineQuery {
 
 	private String searchKeyword = "職缺";
+	private KeywordList keywordList;
 	private String content;
 	private List<Job> resultList;
 
-	public SearchEngineQuery(){ }
-
-
-	public void setSearchKeyword(String searchKeyword) {
-		this.searchKeyword = searchKeyword;
+	public SearchEngineQuery(){
+		keywordList = new KeywordList();
 	}
 
 
-	private String fetchContent(String url) throws IOException {
+	public void addKeyword(Keyword keyword) {
+//		this.searchKeyword = searchKeyword;
+		keywordList.addKeyword(keyword);
+	}
+
+	public void deleteAllKeywords() {
+		keywordList = new KeywordList();
+	}
+
+
+
+
+	private String fetchContent(String url)  {
 		String retVal = "";
-		URL u = new URL(url);
-		URLConnection conn = u.openConnection();
+		try {
+			System.out.println("fetch url: " + url);
+			URL u = new URL(url);
+			URLConnection conn = u.openConnection();
 //		conn.setRequestProperty("User-agent", "Chrome/7.0.517.44");	// 偽裝成瀏覽器偽裝得不夠
-		conn.setRequestProperty("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36");
-		InputStream in = conn.getInputStream();
-		InputStreamReader inReader = new InputStreamReader(in, StandardCharsets.UTF_8);
-		BufferedReader bufReader = new BufferedReader(inReader);
-		String line = null;
-		while((line=bufReader.readLine())!=null) {
-			retVal += line;
+			conn.setRequestProperty("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36");
+			InputStream in = conn.getInputStream();
+			InputStreamReader inReader = new InputStreamReader(in, StandardCharsets.UTF_8);
+			BufferedReader bufReader = new BufferedReader(inReader);
+			String line = null;
+			while ((line = bufReader.readLine()) != null) {
+				retVal += line;
+			}
+		} catch (IOException e) {
+			return retVal;
 		}
 		return retVal;
 	}
@@ -55,7 +72,10 @@ public class SearchEngineQuery {
 	 * Google
 	 */
 	public List<Job> queryGoogle() throws IOException {
-		content = fetchContent("https://www.google.com/search?q=" + searchKeyword);
+
+		String weightsQuery = keywordList.getWeightsQueryParam().equals("") ? "" : "weight=" + keywordList.getWeightsQueryParam();
+		String url = "https://www.google.com/search?q=" + keywordList.getKeywordsQueryParam() + "&" + weightsQuery;
+		content = fetchContent(url);
 		resultList = new ArrayList<>();
 		Document doc = Jsoup.parseBodyFragment(content);
 		Element body = doc.body();
@@ -78,8 +98,8 @@ public class SearchEngineQuery {
 	 * Bing
 	 */
 	public List<Job> queryBing() throws IOException {
-//		content = fetchContent("https://www.bing.com/search?q=" + searchKeyword);
-		content = fetchContent("https://www.bing.com/search?q=" + searchKeyword);
+		String weightsQuery = keywordList.getWeightsQueryParam().equals("") ? "" : "&weight=" + keywordList.getWeightsQueryParam();
+		content = fetchContent("https://www.bing.com/search?q=" + keywordList.getKeywordsQueryParam() + "&" + weightsQuery);
 
 		resultList = new ArrayList<>();
 		Document doc = Jsoup.parse(content);
@@ -90,7 +110,7 @@ public class SearchEngineQuery {
 		Job job = null;
 		int i = 0;
 		for (Element postEle : postsEle) {
-			if (i >= 5) break;
+			if (i >= 10) break;
 			String title = postEle.select("h2").select("a").text();
 			String source = postEle.select("h2").select("a").attr("href");
 			String desc = postEle.select("div[class=b_caption]").select("p").text();
@@ -105,7 +125,8 @@ public class SearchEngineQuery {
 	 * Yahoo
 	 */
 	public List<Job> queryYahoo() throws IOException {
-		content = fetchContent("https://tw.search.yahoo.com/search;_ylt=AwrtFncQDhNe03gAqBBq1gt.;_ylc=X1MDMjExNDcwNTAwMgRfcgMyBGZyAwRncHJpZAMEbl9yc2x0AzAEbl9zdWdnAzAEb3JpZ2luA3R3LnNlYXJjaC55YWhvby5jb20EcG9zAzAEcHFzdHIDBHBxc3RybAMEcXN0cmwDMTgEcXVlcnkDJUU4JTgxJUI3JUU3JUJDJUJBBHRfc3RtcAMxNTc4MzA3MDk2?fr2=sb-top-tw.search&p=" + searchKeyword + "&fr=sfp&iscqry=");
+		String weightsQuery = keywordList.getWeightsQueryParam().equals("") ? "" : "&weight=" + keywordList.getWeightsQueryParam();
+		content = fetchContent("https://tw.search.yahoo.com/search;_ylt=AwrtFncQDhNe03gAqBBq1gt.;_ylc=X1MDMjExNDcwNTAwMgRfcgMyBGZyAwRncHJpZAMEbl9yc2x0AzAEbl9zdWdnAzAEb3JpZ2luA3R3LnNlYXJjaC55YWhvby5jb20EcG9zAzAEcHFzdHIDBHBxc3RybAMEcXN0cmwDMTgEcXVlcnkDJUU4JTgxJUI3JUU3JUJDJUJBBHRfc3RtcAMxNTc4MzA3MDk2?fr2=sb-top-tw.search&p=" + keywordList.getKeywordsQueryParam()  + "&" + weightsQuery  + "&fr=sfp&iscqry=");
 		resultList = new ArrayList<>();
 		Document doc = Jsoup.parseBodyFragment(content);
 		Element body = doc.body();
@@ -114,7 +135,7 @@ public class SearchEngineQuery {
 		Job job = null;
 		int i = 0;
 		for (Element postEle : postsEle) {
-			if (i >= 5) break;
+			if (i >= 10) break;
 			String title = postEle.select("h3[class=title]").select("a[class= ac-algo fz-l lh-20 tc d-ib va-mid]").text();
 			String source = postEle.select("h3[class=title]").select("a").attr("href");
 			String desc = postEle.select("p[class=fbox-ov fbox-lc3 d-box ov-h lh-l]").text();
@@ -133,7 +154,7 @@ public class SearchEngineQuery {
 	 * @throws IOException
 	 */
 	public List<Job> queryJobList() throws IOException{ 	//HashMap<String, String>
-		content= fetchContent("https://www.google.com/search?q=" + searchKeyword + "&ibp=htl;jobs&sa=X&ved=2ahUKEwjj1uTxx93mAhXRGaYKHf7xCZEQiYsCKAB6BAgKEAM#htivrt=jobs&htidocid=gjWPJUJRSlCr-jBgAAAAAA%3D%3D&fpstate=tldetail");
+		content= fetchContent("https://www.google.com/search?q=" + keywordList.getKeywordsQueryParam() + "&ibp=htl;jobs&sa=X&ved=2ahUKEwjj1uTxx93mAhXRGaYKHf7xCZEQiYsCKAB6BAgKEAM#htivrt=jobs&htidocid=gjWPJUJRSlCr-jBgAAAAAA%3D%3D&fpstate=tldetail");
 		//
 		resultList = new ArrayList<>();
 		Document doc = Jsoup.parseBodyFragment(content);
@@ -172,7 +193,7 @@ public class SearchEngineQuery {
 	 * @return Job 物件 （擁有 detail information）
 	 */
 	public Job querySingleJob(String id) throws IOException {
-		content = fetchContent("https://www.google.com/search?q=" + searchKeyword + "&ibp=htl;jobs&sa=X&ved=2ahUKEwih2O2NzN3mAhWQHKYKHZfvA3UQiYsCKAB6BAgKEAM#htivrt=jobs&htidocid=" + id + "AAAAAA%3D%3D&fpstate=tldetail");
+		content = fetchContent("https://www.google.com/search?q=" + keywordList.getKeywordsQueryParam() + "&ibp=htl;jobs&sa=X&ved=2ahUKEwih2O2NzN3mAhWQHKYKHZfvA3UQiYsCKAB6BAgKEAM#htivrt=jobs&htidocid=" + id + "AAAAAA%3D%3D&fpstate=tldetail");
 		Job job = null;
 		if (content != null) {
 //			Document doc = Jsoup.parse(content);
@@ -199,4 +220,66 @@ public class SearchEngineQuery {
 		return job; // 擁有詳細信息 的 job
 	}
 
+
+	/**
+	 * 利用不同搜尋引擎權重查詢的結果
+	 * @param jobList
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Job> queryJobListWeight(List<Job> jobList) throws IOException {
+		List<Job> list = new LinkedList<>();
+		for (Job job : jobList) {
+			String jobUrl = job.getSource();
+			// Google 職缺頁面, source 另外處理
+//			if (!jobUrl.startsWith("http://") || !jobUrl.startsWith("https://")) {
+//				jobUrl = querySingleJob(job.getId()).getSource();
+//				System.out.println("不應該是 google 職缺的頁面：" + jobUrl);
+//			}
+			WebPage root = new WebPage(jobUrl, job.getTitle());
+			WebTree tree = new WebTree(root);
+			/* 獲取底下的連結 a */
+			content = fetchContent(jobUrl);
+			if (content != null) {
+				Document doc = Jsoup.parse(content);
+				Element body = doc.body();
+				if (body != null) {
+					// TODO: nav a href 先抓一層，之後要修改 【.select("nav")】
+					Elements navAEles = body.select("nav").select("a");
+					ArrayList<String> urlTemp = new ArrayList<>();
+					if (navAEles != null && navAEles.size() > 0) {
+						System.out.println("nav 連結 數量: " + navAEles.size());
+						urlTemp.add(jobUrl);
+						for (Element navA : navAEles) {
+							String href = navA.attr("href");
+							if (href.equals(jobUrl) || urlTemp.contains(href)) {
+								continue;
+							}
+							urlTemp.add(href);
+							tree.root.addChild(new WebNode(new WebPage(href, "")));
+						}
+					}
+					tree.setPostOrderScore(keywordList.getKeywordList());
+					System.out.println("分數: " + tree.root.nodeScore);
+					double score = tree.root.nodeScore;
+					// String title, String desc, String source, double score
+					list.add(new Job(job.getTitle(), job.getDesc(), job.getSource(), score));
+				}
+			}
+		}
+		System.out.println("before weight sort: " + list);
+		list.sort(new Comparator<Job>() {
+			@Override
+			public int compare(Job o1, Job o2) {
+				// 如果 o1.score > o2.score, 則 o1 排在 o2 前面
+				if (o1.getScore() > o2.getScore()) {
+					return -1;
+				} else {
+					return 1;
+				}
+			}
+		});
+		System.out.println("after weight sort: " + list);
+		return list;
+	}
 }

@@ -1,6 +1,7 @@
 package com.ql.jobsearch.api;
 
 import com.ql.jobsearch.pojo.Job;
+import com.ql.jobsearch.pojo.Keyword;
 import com.ql.jobsearch.util.SearchEngineQuery;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,21 +22,27 @@ public class JobsEndpoints {
 	                       @RequestParam("keyword") String keyword,
 	                       @RequestParam(value = "weight", required = false) String weight) {
 		try {
-//			if (weight != null ) {  /* 使用規定格式的關鍵字和權重進行搜尋 */
+			keyword = keyword.replaceAll("\\s", "+");
+			keyword = keyword.replaceAll(",", "+");
+			String[] keywordsArr = keyword.split("/+");
+			searchEngineQuery.deleteAllKeywords();
+			for (String keywordStr : keywordsArr) {
+				searchEngineQuery.addKeyword(new Keyword(keywordStr));
+			}
+			/* General Search - 一般搜尋 */
+			List<Job> jobList = searchEngineQuery.queryJobList();   // 查詢到的結果
 
-//			} else {    /* 一般搜尋 */
-				keyword = keyword.replaceAll("\\s", ";");
-				keyword = keyword.replaceAll(",", ";");
-				System.out.println("jobs keyword>> " + keyword);
-				searchEngineQuery.setSearchKeyword(keyword);
-				List<Job> jobList = searchEngineQuery.queryJobList();
-				model.addAttribute("jobList", jobList);
-				model.addAttribute("keyword", keyword);
-				//
-				model.addAttribute("category", "職缺搜尋功能");
-//			}
+//			/* Weight Search - 權重搜尋 */
+			if (weight != null && weight.length() > 0) model.addAttribute("weight", weight);
+
+
+//			searchEngineQuery.queryJobListWeight(jobList);  // 將用關鍵字查到的 jobList 利用權重重新查詢及排序
+			model.addAttribute("jobList", jobList);
+			model.addAttribute("keyword", keyword);
+			//
+			model.addAttribute("category", "職缺搜尋功能");
 		} catch (IOException e) {
-			return "error/500";   // 500 頁面
+			e.printStackTrace();
 		}
 		return "jobs";
 	}
@@ -46,7 +53,7 @@ public class JobsEndpoints {
 			Job job = searchEngineQuery.querySingleJob(id);
 			model.addAttribute(job);
 		} catch (IOException e) {
-			return "error/500";   // 500 頁面
+			e.printStackTrace();
 		}
 
 		return "job";   // 到 job.html 頁面

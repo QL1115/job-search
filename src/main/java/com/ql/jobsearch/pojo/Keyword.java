@@ -19,6 +19,11 @@ public class Keyword {
 		this.count = count;
 	}
 
+	public Keyword(String name, double weight) {
+		this(name);
+		this.weight = weight;
+	}
+
 	public Keyword(String name, int count, double weight) {
 		this(name, count);
 		this.weight = weight;

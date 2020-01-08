@@ -31,6 +31,8 @@ public class Job {
 	// 刊登日期：Google -> 幾天前
 	private String postDate;
 
+	private double score;
+
 
 
 
@@ -40,6 +42,11 @@ public class Job {
 		this.title = title;
 		this.desc = desc;
 		this.source = source;
+	}
+
+	public Job (String title, String desc, String source, double score) {
+		this(title, desc, source);
+		this.score = score;
 	}
 
 	public Job (String id, String title, String compName, String desc, String salaries,
@@ -139,7 +146,16 @@ public class Job {
 		this.postDate = postDate;
 	}
 
-//	@Override
+	public double getScore() {
+		return score;
+	}
+
+	public void setScore(double score) {
+		this.score = score;
+	}
+
+
+	//	@Override
 //	public String toString() {
 //		return "Job{" +
 //				"id='" + id + '\'' +
@@ -155,6 +171,8 @@ public class Job {
 //	}
 
 
+
+
 	@Override
 	public String toString() {
 		return "Job{" +
@@ -166,6 +184,7 @@ public class Job {
 				", location='" + location + '\'' +
 				", source='" + source + '\'' +
 				", postDate='" + postDate + '\'' +
+				", score='" + score + '\'' +
 				'}';
 	}
 }

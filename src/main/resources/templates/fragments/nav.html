@@ -24,7 +24,7 @@
                 <th:block th:if="${#httpServletRequest.requestURI} == '/jobs'">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="searchEngineDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Search Engine <span id="type-span"></span>
+                            Search Engine <span id="engine-span"></span>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <div class="dropdown-item engine-item" id="google">Google</div>
@@ -42,7 +42,7 @@
                 <th:block th:if="${#httpServletRequest.requestURI} == '/'">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="typeDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Search Type
+                        Search Type <span id="type-span">(general-search)</span>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <div class="dropdown-item type-item item-click" id="general-search">General Search</div>
@@ -53,11 +53,12 @@
                 </li>
                 </th:block>
             </ul>
-
+            <th:block th:if="${#httpServletRequest.requestURI} != '/'">
             <form class="form-inline my-2 my-lg-0" action="/jobs">
                 <input class="form-control mr-sm-2" type="search" name="keyword" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
+            </th:block>
         </div>
     </nav>
 

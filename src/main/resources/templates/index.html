@@ -54,7 +54,7 @@
                     <button class="btn btn-outline-secondary" id="generate-input-btn" type="button">Generate Field</button>
                 </div>
             </div>
-            <form action="/jobs" class="hidden col-sm-8" id="weight-search-form">
+            <form action="/jobs"  class="hidden col-sm-8" id="weight-search-form">
                 <!--<div class="input-group" >-->
                     <!--<div class="input-group-prepend" aria-label="Small" aria-describedby="inputGroup-sizing-sm">-->
                         <!--<span class="input-group-text"  >Keyword and Weight</span>-->
@@ -98,8 +98,8 @@
                                                         '<div class="input-group-prepend" aria-label="Small" aria-describedby="inputGroup-sizing-sm">' +
                                                             '<span class="input-group-text"  >#' + i + '  Keyword, Weight</span>' +
                                                         '</div>' +
-                                                        '<input type="text" class="form-control keyword-input" pattern="\\S(.*\\S)?" name="keyword"  placeholder="K" required>' +
-                                                        '<input type="number" class="form-control weight-input" name="weight" placeholder="W (0.1~1)" step="0.1" min="0.1" max="1" required>' +
+                                                        '<input type="text" autocomplete="off" class="form-control keyword-input" pattern="\\S(.*\\S)?" name="keyword"  placeholder="K" required>' +
+                                                        '<input type="number" autocomplete="off" class="form-control weight-input" name="weight" placeholder="W (1~10)" step="1" min="1" max="10" required>' +
                                                     '</div>');
                 }
             } else {
@@ -111,6 +111,7 @@
         $('.type-item').on('click', function() {
             var type = $(this).attr("id");
             $('.type-item').removeClass('item-click');
+            $('#type-span').text('(' + type + ')');
             $('#' + type).addClass("item-click");
             if (type === 'general-search') {
                 $('#weight-search-div').addClass('hidden');
@@ -120,6 +121,7 @@
                 $('#weight-search-div').removeClass('hidden');
             }
         });
+
 
 
         // delay 一下，再搜尋
