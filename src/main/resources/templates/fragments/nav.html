@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <!-- 導覽列 -->
+    <nav th:fragment="nav" class="navbar navbar-expand-lg navbar-light bg-light" id="nav">
+        <a class="navbar-brand" href="/">Job Search</a>
+        <button  class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <!--<li class="nav-item active">-->
+                    <!--<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>-->
+                <!--</li>-->
+                <!--<li class="nav-item">-->
+                    <!--<a class="nav-link" href="#">Link</a>-->
+                <!--</li>-->
+                <th:block th:if="${#httpServletRequest.requestURI} == '/jobs'">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="searchEngineDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Search Engine <span id="type-span"></span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <div class="dropdown-item engine-item" id="google">Google</div>
+                            <div class="dropdown-item engine-item" id="bing">Bing</div>
+                            <div class="dropdown-item engine-item" id="yahoo">Yahoo!</div>
+                            <!--<div class="dropdown-item engine-item" id="google" href="/search-engine?engine=google">Google</div>-->
+                            <!--<div class="dropdown-item engine-item" id="bing" href="/search-engine?engine=bing">Bing</div>-->
+                            <!--<div class="dropdown-item engine-item" id="yahoo" href="/search-engine?engine=yahoo">Yahoo!</div>-->
+                            <!--<div class="dropdown-divider"></div>-->
+                            <!--<a class="dropdown-item" href="#">Something else here</a>-->
+                        </div>
+                    </li>
+
+                </th:block>
+                <th:block th:if="${#httpServletRequest.requestURI} == '/'">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="typeDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Search Type
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-item type-item item-click" id="general-search">General Search</div>
+                        <div class="dropdown-item type-item" id="weight-search">Weight Search</div>
+                        <!--<div class="dropdown-divider"></div>-->
+                        <!--<a class="dropdown-item" href="#">Something else here</a>-->
+                    </div>
+                </li>
+                </th:block>
+            </ul>
+
+            <form class="form-inline my-2 my-lg-0" action="/jobs">
+                <input class="form-control mr-sm-2" type="search" name="keyword" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+
+
+
+
+</body>
+</html>

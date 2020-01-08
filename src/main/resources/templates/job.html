@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" media="screen" th:href="@{/css/global.css}" href="../static/css/global.css"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/job.css}" href="../static/css/job.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <title>Job</title>
+</head>
+<body>
+
+    <nav th:insert="fragments/nav"></nav>
+    <!--<button class="backBtn" onclick="goback()" type="button" class="btn btn-dark">jiantou</button>-->
+
+    <div class="container-fluid">
+        <div class="row  justify-content-between bf-btn">
+            <th:block ><div class="ml-3 col-3 text-left"><small id="back" class="text-muted back">&larr; Back</small></div></th:block>
+            <th:block><div class="mr-3 col-3 text-right"><small id="next" class="text-muted back">Next &rarr;</small></div></th:block>
+        </div>
+        <br>
+
+
+
+        <!-- 過濾器 -->
+        <!--<div class="filters row justify-content-center align-items-center">-->
+            <!--<button type="button" class="rounded-circle btn btn-outline-primary">地區</button>-->
+            <!--<button type="button" class="rounded-circle btn btn-outline-primary">薪資</button>-->
+            <!--<button type="button" class="rounded-circle btn btn-outline-primary">職務類型</button>-->
+        <!--</div>-->
+
+
+            <div class="row jobdetail justify-content-center">
+                <div class="col-xs-12 col-sm-11 col-9">
+                    <div class="row">
+                        <h4 class="col font-weight-bolder" th:text="${job.title}"></h4>
+                    </div>
+                    <div class="row">
+                        <div class="col" th:text="${job.compName}"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col" th:text="${job.location}"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col" th:text="${job.salaries}"></div>
+                    </div>
+                    <div class="row">
+                        <a style="text-decoration:none;" target="_blank" th:href="@{${job.source}}" id="source-href" class="col"  ><span class="border rounded" style=" padding: 0.2em;background-color: #4285f4; color: #fff;">前往應徵</span></a>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <span style="line-height:1.5em;display:block" th:utext="${job.desc}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div >
+    </div>
+
+
+    <!-- JQuery, Popper, Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            $('#back').on('click', function () {
+                history.back();
+            });
+            $('#next').on('click', function () {
+                window.history.forward();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+html, body {
+    background-color: #FAFAFA;
+    height: 100vh;
+
+}
+
+.container-fluid {
+    background-color: #FAFAFA;
+    height: 100vh;
+}
+
+.filters {
+    margin-top: 2em;
+}
+
+.selectedFilter {
+    padding: 0.1em;
+    /*margin-right: 1em;*/
+}
+
+.btn {
+    padding: 0.2em;
+    margin: 0.5em;
+}
+
+
+
+.top-buffer { margin-top:1em; }
+
+.item-top-buffer {
+    margin-top: 0.5em;
+}

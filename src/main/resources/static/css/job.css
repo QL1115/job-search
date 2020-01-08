@@ -1,0 +1,32 @@
+html, body {
+    background-color: #FAFAFA;
+    height: 100vh;
+
+}
+
+nav {
+    background-color: #ffffff;
+}
+
+.container-fluid {
+    background-color: #FAFAFA;
+    height: 100vh;
+}
+
+.filters {
+    margin-top: 2em;
+}
+
+
+.btn {
+    padding: 0.2em;
+    margin: 0.5em;
+}
+
+#source-href {
+    margin: 0.5em;
+}
+
+.jobdetail {
+    margin-top: 1em;
+}

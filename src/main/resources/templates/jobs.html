@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--<meta charset="UTF-8">-->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" media="screen" th:href="@{/css/global.css}" href="../static/css/global.css"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/jobs.css}" href="../static/css/jobs.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <title>Jobs Overview</title>
+    <style>
+        .item-click {
+            background-color: #4285f4;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <nav th:insert="fragments/nav"></nav>
+    <div class="container-fluid">
+
+        <!-- 退回上一頁或到下一頁 -->
+        <div class="row  justify-content-between bf-btn">
+            <th:block ><div class="ml-3 col-3 text-left"><small id="back" class="text-muted back">&larr; Back</small></div></th:block>
+            <th:block><div class="mr-3 col-3 text-right"><small id="next" class="text-muted back">Next &rarr;</small></div></th:block>
+        </div>
+        <br>
+        <!-- main -->
+        <div id="replacement">
+            <th:block th:if="${jobList.size() > 0}">
+                <div class="row text-truncate justify-content-center align-items-center list-group" th:each="job : ${jobList}">
+                    <!-- 範例 -->
+                    <div class="col-sm-9 col-12 item-top-buffer text-truncate" >
+                        <a th:href="@{|/jobs/${job.id}|}" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 text-truncate"  th:text="${job.title}">Job title </h6>
+                                <small class="text-muted"  th:text="${job.postDate}">3 days ago</small>
+                            </div>
+                            <small class="text-muted text-truncate"  th:text=" ${job.compName}"> company name</small>
+                            <div class="d-flex e-100 row justify-content-between">
+                                <div>
+                                    <small class="col-4 text-muted border text-truncate" th:field="${job.location}" th:text="${job.location}">location</small>
+                                    <th:block th:if="${job.salaries != ''}"><small class="col text-muted border"  th:text="${job.salaries}">salaries</small></th:block>
+                                </div>
+                            <small class="text-muted" th:text="${job.source}">source</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </th:block>
+            <th:block th:if="${jobList.size() == 0}">
+                <div class="row justify-content-center ">
+                    <div class="align-items-center col-4 text-center" style="margin-top: 2em;">
+                        <h5>無符合的搜尋結果<br/><br/>請改用其他搜尋引擎搜索</h5>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+
+    </div>
+
+
+    <!-- JQuery, Popper, Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            $('#back').on('click', function () {
+                history.back();
+            });
+            $('#next').on('click', function () {
+                window.history.forward();
+            });
+
+            $('.engine-item').on('click', function() {
+                var engine = $(this).attr("id");
+                $('.engine-item').removeClass('item-click');
+                $('#' + engine).addClass("item-click");
+                $('#type-span').text('(' + engine + ')');
+
+                // alert($('#type-span'));
+                var keyword = /*[[${keyword}]]*/ 'java';
+                if ("google" === engine || "bing" === engine || "yahoo" === engine) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/search-engine?engine=" + encodeURIComponent(engine) + "&keyword=" + encodeURIComponent(keyword),
+                        dataType: "json",
+                        success: function (data) {
+                            $('#replacement').empty();  // 清空
+                            $.each(data, function(i, item) {
+                                $('#replacement').addClass('col');
+                                $('#replacement').append('  <div class="row justify-content-center">' +
+                                                                '<div class="card col-sm-9">' +
+                                                                    '<div class="card-body">' +
+                                                                        '<h6 class="card-title">' + item.title + '</h6>' +
+                                                                        '<a target="_blank" href="' + item.source + '" ><small class="text-truncate " style="display: block">' + item.source + '</small></a>' +
+                                                                        '<p class="card-text"><small>' + item.desc + '</small></p>' +
+                                                                    '</div>' +
+                                                                '</div>' +
+                                                        '</div>');
+                            });
+
+                            // alert(data[0].title)
+                            // $('#result').find('a').remove();
+                            // data = data.substring(1, data.length - 1);
+                            // var array = data.split(',');
+                            // if (array.length > 0) {
+                            //     var i = 0;
+                            //     while (i < array.length) {    // 推薦列表
+                            //         var str = array[i].substring(1, array[i].length - 1);
+                            //         // 小心：傳入的參數 要進行 url encode 的動作。否則類似 C++ 的參數傳入會造成 500 錯誤
+                            //         $('#result').append('<a href="jobs?keyword=' + encodeURIComponent(str) + '" class="list-group-item"><span>' + str + '</span></a>');
+                            //         i++;
+                            //     }
+                            //     $('#list').show();
+                            // }
+                            // }
+
+                        }
+                    });
+                }
+            })
+
+
+            // 監聽滑動到頁面底部的事件
+            // $(window).on('scroll', function() {
+            //     if($(window).scrollTop() + $(window).height() > $(document).height() - 50) {
+            //         /*<![CDATA[*/
+            //         var keyword = /*[[${keyword}]]*/ 'java';
+            //         /*]]>*/
+            //         $.ajax({
+            //             url : "/jobs?keyword=" + keyword,
+            //             dataType: "text",
+            //             success : function (data) {
+            //                 alert(data);
+            //                 // if (keyword.length != 0) {
+            //                 //     var array = data.split('\n');
+            //                 //     var result = array.filter(function (value) {
+            //                 //         return value.indexOf(keyword) >= 0;
+            //                 //     });
+            //                 //     if (result.length > 0) {
+            //                 //         var i = 0;
+            //                 //         while (i < result.length) {    // 推薦列表
+            //                 //             if (i >= 5) break;
+            //                 //             $('#result').append('<a href="jobs?keyword=' + result[i] + '" class="list-group-item"><span>' + result[i] + '</span></a>');
+            //                 //             i++;
+            //                 //         }
+            //                 //         $('#list').show();
+            //                 //     }
+            //                 // }
+            //
+            //             }
+            //         });
+            //     }
+            // });
+
+
+        });
+
+
+    </script>
+</body>
+</html>
